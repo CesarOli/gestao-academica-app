@@ -37,4 +37,13 @@ public class Aluno extends Pessoa{
     public Aluno() {
         this.notas = new HashMap<>();
     }
+
+    @Override
+    public String toString() {
+        return "Aluno{" +
+                "nome='" + getNome() + '\'' +
+                ", matrícula='" + matricula + '\'' +
+                ", curso=" + curso +
+                '}';
+    }
 }
