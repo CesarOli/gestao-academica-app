@@ -36,4 +36,12 @@ public class Professor extends Pessoa {
     public Professor() {
         this.disciplinasLecionadas = new ArrayList<>();
     }
+
+    @Override
+    public String toString() {
+        return "Professor{" +
+                "nome='" + getNome() + '\'' +
+                ", departamento=" + getDepartamento() +
+                '}';
+    }
 }
