@@ -74,7 +74,7 @@ public class AcademiaService {
 
     public void lancarNota(Aluno aluno, Disciplina disciplina, double nota) {
         if (!aluno.getNotas().containsKey(disciplina)) {
-            System.out.println("ERRO: O aluno " + aluno.getNome() + " não está matricula nesta disciplina " + disciplina.getNome() + ".");
+            System.out.println("ERRO: O aluno " + aluno.getNome() + " não está matriculado nesta disciplina " + disciplina.getNome() + ".");
             return;
         }
         if (nota < 0 || nota > 10) {
@@ -84,5 +84,25 @@ public class AcademiaService {
         List<Double> notasDaDisciplina = aluno.getNotas().get(disciplina);
         notasDaDisciplina.add(nota);
         System.out.println("Nota " + nota + " lançada para o aluno " + aluno.getNome() + " na disciplina solicitada, '" + disciplina.getNome() + "'.");
+    }
+
+    public double calcularMediaDoAlunoNaDisciplina(Aluno aluno, Disciplina disciplina) {
+        if (!aluno.getNotas().containsKey(disciplina)) {
+            System.out.println("ALERTA: O aluno " + aluno.getNome() + " não possui notas em " + disciplina.getNome() + ".");
+            return 0.0;
+        }
+
+        List<Double> notas = aluno.getNotas().get(disciplina);
+
+        if (notas.isEmpty()) {
+            return 0.0;
+        }
+
+        double soma = 0.0;
+        for (double nota : notas) {
+            soma += nota;
+        }
+
+        return soma / notas.size();
     }
 }

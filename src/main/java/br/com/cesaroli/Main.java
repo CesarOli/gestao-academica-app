@@ -8,6 +8,7 @@ import br.com.cesaroli.service.AcademiaService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -42,6 +43,7 @@ public class Main {
             System.out.println("4 - Listar Professores Cadastrados");
             System.out.println("5 - Matricular Aluno em Disciplina");
             System.out.println("6 - Lançar Nota de Aluno");
+            System.out.println("7 - Boletin do Aluno");
             System.out.println("0 - Sair do Sistema");
             System.out.println("Escolha uma opção: ");
 
@@ -183,6 +185,45 @@ public class Main {
                     } catch (Exception e) {
                         System.out.println("ERRO: Entrada inválida.");
                         scanner.nextLine();
+                    }
+                    break;
+                case 7:
+                    System.out.println("\n-- Consulta de Boletim do Aluno --");
+                    if (service.getAlunos().isEmpty()) {
+                        System.out.println("ERRO: Nenhum aluno cadastrado.");
+                        break;
+                    }
+
+                    try {
+                        System.out.println("\nSelecione o aluno para consultar o boletim (pelo número): ");
+                        for (int i = 0; i < service.getAlunos().size(); i++) {
+                            System.out.println((i + 1) + " - " + service.getAlunos().get(i).getNome());
+                            }
+                        System.out.println("Aluno escolhido: ");
+                        int indiceAluno = Integer.parseInt(scanner.nextLine()) - 1;
+                        Aluno alunoEscolhido = service.getAlunos().get(indiceAluno);
+
+                        System.out.println("\n-- BOLETIM DO ALUNO: " + alunoEscolhido.getNome() + " --");
+
+                        if (alunoEscolhido.getNotas().isEmpty()) {
+                            System.out.println("ERRO: O aluno " + alunoEscolhido.getNome() + " não está matriculado em nenhuma disciplina.");
+                            break;
+                        }
+
+                        for (Map.Entry<Disciplina, List<Double>> entry : alunoEscolhido.getNotas().entrySet()) {
+                            Disciplina disciplina = entry.getKey();
+                            List<Double> notas = entry.getValue();
+
+                            double media = service.calcularMediaDoAlunoNaDisciplina(alunoEscolhido, disciplina);
+
+                            System.out.println("\nDisciplina: " + disciplina.getNome());
+                            System.out.println("Notas: " + (notas.isEmpty() ? "Nenhuma nota lançada" : notas.toString()));
+                            System.out.printf("Média: %.2f\n", media);
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        System.out.println("ERRO: Opção inválida. Você digitou um número que não está na lista");
+                    } catch (NumberFormatException e) {
+                        System.out.println("ERRO: Entrada inválida. Por favor, digite apenas números");
                     }
                     break;
             }
