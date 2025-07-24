@@ -16,6 +16,14 @@ public class AcademiaService {
     private List<Curso> cursos = new ArrayList<>();
     private List<Disciplina> disciplinas = new ArrayList<>();
 
+    public List<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public void setDisciplinas(List<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
+    }
+
     public Aluno cadastrarAluno(String nome, String email, String matricula, Curso curso) {
 
         Aluno novoAluno = new Aluno();
@@ -52,5 +60,15 @@ public class AcademiaService {
 
     public List<Professor> getProfessores() {
         return this.professores;
+    }
+
+    public void matricularAlunoEmDisciplina(Aluno aluno, Disciplina disciplina) {
+
+        if (aluno.getNotas().containsKey(disciplina)) {
+            System.out.println("ERRO: Aluno' " + aluno.getNome() + "' já está matrículado(a) na disciplina '" + disciplina.getNome() + "'.");
+            return;
+        }
+        aluno.getNotas().put(disciplina, new ArrayList<>());
+        System.out.println("Matrícula do aluno " + aluno.getNome() + " na disciplina " + disciplina.getNome() + " realizada com sucesso!");
     }
 }

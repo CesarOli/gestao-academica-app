@@ -2,6 +2,7 @@ package br.com.cesaroli;
 
 import br.com.cesaroli.model.Aluno;
 import br.com.cesaroli.model.Curso;
+import br.com.cesaroli.model.Disciplina;
 import br.com.cesaroli.model.Professor;
 import br.com.cesaroli.service.AcademiaService;
 
@@ -19,6 +20,16 @@ public class Main {
         Curso cursoPadrao = new Curso();
         cursoPadrao.setNome("Análise e Desenvolvimento de Sistemas");
 
+        Disciplina programacaoNivelUm = new Disciplina();
+        programacaoNivelUm.setNome("Progamação I");
+
+        Disciplina bancoDeDados = new Disciplina();
+        bancoDeDados.setNome("Banco de Dados");
+
+        service.getDisciplinas().add(programacaoNivelUm);
+        service.getDisciplinas().add(bancoDeDados);
+
+
         System.out.println("#### BEM-VINDO AO SISTEMA DE GESTÃO ACADÊMICA ####");
 
         while(opcao != 0) {
@@ -27,6 +38,7 @@ public class Main {
             System.out.println("2 - Cadastrar Novo Professor");
             System.out.println("3 - Listar Alunos Cadastrados");
             System.out.println("4 - Listar Professores Cadastrados");
+            System.out.println("5 - Matricular Aluno em Disciplina");
             System.out.println("0 - Sair do Sistema");
             System.out.println("Escolha uma opção: ");
 
@@ -87,6 +99,47 @@ public class Main {
                             System.out.println(professor);
                         }
                     }
+                    break;
+                case 5:
+                    System.out.println("\n-- Matrícula de Aluno em Disciplina --");
+
+                    if (service.getAlunos().isEmpty()) {
+                        System.out.println("ERRO: É preciso cadastrar pelo menos um aluno primeiro. Obrigado!");
+                        break;
+                    }
+                    if (service.getDisciplinas().isEmpty()) {
+                        System.out.println("ERRO: Nenhuma disciplina disponível para matrícula.");
+                        break;
+                    }
+
+                    try {
+                        System.out.println("Selecione o aluno (pelo número): ");
+                        for (int i = 0; i < service.getAlunos().size(); i++) {
+                            System.out.println((i + 1) + " - " + service.getAlunos().get(i).getNome());
+                        }
+                        System.out.println("Aluno escolhido: ");
+                        int indiceAluno = scanner.nextInt() - 1;
+
+                        System.out.println("\nSelecione a disciplina (pelo número): ");
+                        for (int i = 0; i < service.getDisciplinas().size(); i++) {
+                            System.out.println((i + 1) + " - " + service.getDisciplinas().get(i).getNome());
+                        }
+                        System.out.println("Disciplina escolhida: ");
+                        int indiceDisciplina = scanner.nextInt() - 1;
+                        scanner.nextLine();
+
+                        Aluno alunoEscolhido = service.getAlunos().get(indiceAluno);
+                        Disciplina disciplinaEscolhida = service.getDisciplinas().get(indiceDisciplina);
+
+                        service.matricularAlunoEmDisciplina(alunoEscolhido, disciplinaEscolhida);
+                    } catch (IndexOutOfBoundsException e) {
+                        System.out.println("ERRO: Opção inválida: Você digitou um número que não está na lista.");
+                        scanner.nextLine();
+                    } catch (Exception e) {
+                        System.out.println("ERRO: Entrada inválida. Por favor, digite apenas números");
+                        scanner.nextLine();
+                    }
+                    break;
             }
         }
     }
