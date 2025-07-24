@@ -65,10 +65,24 @@ public class AcademiaService {
     public void matricularAlunoEmDisciplina(Aluno aluno, Disciplina disciplina) {
 
         if (aluno.getNotas().containsKey(disciplina)) {
-            System.out.println("ERRO: Aluno' " + aluno.getNome() + "' já está matrículado(a) na disciplina '" + disciplina.getNome() + "'.");
+            System.out.println("ERRO: Aluno' " + aluno.getNome() + "' já está matriculado(a) na disciplina '" + disciplina.getNome() + "'.");
             return;
         }
         aluno.getNotas().put(disciplina, new ArrayList<>());
         System.out.println("Matrícula do aluno " + aluno.getNome() + " na disciplina " + disciplina.getNome() + " realizada com sucesso!");
+    }
+
+    public void lancarNota(Aluno aluno, Disciplina disciplina, double nota) {
+        if (!aluno.getNotas().containsKey(disciplina)) {
+            System.out.println("ERRO: O aluno " + aluno.getNome() + " não está matricula nesta disciplina " + disciplina.getNome() + ".");
+            return;
+        }
+        if (nota < 0 || nota > 10) {
+            System.out.println("ERRO: Nota inválida. A nota deve estar no intervalo entre 0 e 10.");
+            return;
+        }
+        List<Double> notasDaDisciplina = aluno.getNotas().get(disciplina);
+        notasDaDisciplina.add(nota);
+        System.out.println("Nota " + nota + " lançada para o aluno " + aluno.getNome() + " na disciplina solicitada, '" + disciplina.getNome() + "'.");
     }
 }

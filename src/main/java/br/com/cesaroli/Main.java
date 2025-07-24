@@ -6,6 +6,8 @@ import br.com.cesaroli.model.Disciplina;
 import br.com.cesaroli.model.Professor;
 import br.com.cesaroli.service.AcademiaService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -39,6 +41,7 @@ public class Main {
             System.out.println("3 - Listar Alunos Cadastrados");
             System.out.println("4 - Listar Professores Cadastrados");
             System.out.println("5 - Matricular Aluno em Disciplina");
+            System.out.println("6 - Lançar Nota de Aluno");
             System.out.println("0 - Sair do Sistema");
             System.out.println("Escolha uma opção: ");
 
@@ -60,7 +63,6 @@ public class Main {
 
                     service.cadastrarAluno(nomeAluno, emailAluno, matricula, cursoPadrao);
                     break;
-
                 case 2:
                     System.out.println("\n-- Cadastrar Novo Professor --");
 
@@ -79,7 +81,6 @@ public class Main {
 
                     service.cadastrarProfessor(nomeProfessor, emailProfessor, departamentoProfessor, salario);
                     break;
-
                 case 3:
                     System.out.println("\n-- Lista de Alunos --");
                     if (service.getAlunos().isEmpty()) {
@@ -140,7 +141,53 @@ public class Main {
                         scanner.nextLine();
                     }
                     break;
+                case 6:
+                    System.out.println("-- Lançamento de Notas --");
+                    if (service.getAlunos().isEmpty()) {
+                    System.out.println("ERRO: Nenhum aluno cadastrado para lançar notas.");
+                        break;
+                    }
+                    try {
+                        System.out.println("\nSelecione o aluno para lançar a nota: ");
+                        for (int i = 0; i < service.getAlunos().size(); i++) {
+                            System.out.println((i + 1) + " - " + service.getAlunos().get(i).getNome());
+                        }
+                        System.out.println("Aluno escolhido: ");
+                        int indiceAluno = scanner.nextInt() - 1;
+                        Aluno alunoEscolhido = service.getAlunos().get(indiceAluno);
+
+                        if (alunoEscolhido.getNotas().isEmpty()) {
+                            System.out.println("ERRO: O aluno " + alunoEscolhido.getNome() + " não está matriculado em nehuma disciplina.");
+                            break;
+                        }
+
+                        System.out.println("\nSelecione a disciplina para lançar a nota: ");
+
+                        List<Disciplina> disciplinasDoAluno = new ArrayList<>(alunoEscolhido.getNotas().keySet());
+                        for (int i = 0; i < disciplinasDoAluno.size(); i++) {
+                            System.out.println((i + 1) + " - " + disciplinasDoAluno.get(i).getNome());
+                        }
+                        System.out.println("Disciplina escolhida: ");
+                        int indiceDisciplina = scanner.nextInt() - 1;
+                        Disciplina disciplinaEscolhida = disciplinasDoAluno.get(indiceDisciplina);
+
+                        System.out.println("\nDigite a nota ( 0 a 10): ");
+                        double nota = scanner.nextDouble();
+                        scanner.nextLine();
+
+                        service.lancarNota(alunoEscolhido, disciplinaEscolhida, nota);
+
+                    } catch (IndexOutOfBoundsException e) {
+                        System.out.println("ERRO: Opçao inválida. Você digitou um número que não está na lista");
+                        scanner.nextLine();
+                    } catch (Exception e) {
+                        System.out.println("ERRO: Entrada inválida.");
+                        scanner.nextLine();
+                    }
+                    break;
             }
+
         }
     }
 }
+
