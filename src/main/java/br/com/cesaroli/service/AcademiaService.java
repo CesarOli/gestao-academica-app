@@ -1,9 +1,13 @@
 package br.com.cesaroli.service;
 
+import br.com.cesaroli.dao.AlunoDAO;
+import br.com.cesaroli.dao.ProfessorDAO;
+import br.com.cesaroli.dao.DisciplinaDAO;
 import br.com.cesaroli.model.Aluno;
+import br.com.cesaroli.model.Professor;
 import br.com.cesaroli.model.Curso;
 import br.com.cesaroli.model.Disciplina;
-import br.com.cesaroli.model.Professor;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,59 +15,50 @@ import java.util.List;
 
 public class AcademiaService {
 
-    private List<Aluno> alunos = new ArrayList<>();
-    private List<Professor> professores = new ArrayList<>();
-    private List<Curso> cursos = new ArrayList<>();
-    private List<Disciplina> disciplinas = new ArrayList<>();
+    private AlunoDAO alunoDAO;
+    private ProfessorDAO professorDAO;
+    private DisciplinaDAO disciplinaDAO;
 
-    public List<Disciplina> getDisciplinas() {
-        return disciplinas;
-    }
-
-    public void setDisciplinas(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public AcademiaService(AlunoDAO alunoDAO, ProfessorDAO professorDAO, DisciplinaDAO disciplinaDAO) {
+        this.alunoDAO = alunoDAO;
+        this.professorDAO = professorDAO;
+        this.disciplinaDAO = disciplinaDAO;
     }
 
     public Aluno cadastrarAluno(String nome, String email, String matricula, Curso curso) {
-
-        Aluno novoAluno = new Aluno();
-
-        novoAluno.setNome(nome);
-        novoAluno.setEmail(email);
-        novoAluno.setMatricula(matricula);
+        Aluno novoAluno = new Aluno(nome, email, matricula);
         novoAluno.setCurso(curso);
-
-        this.alunos.add(novoAluno);
-
-        System.out.println("Aluno " + nome + " cadastrado!");
-
+        this.alunoDAO.salvar(novoAluno);
         return novoAluno;
     }
 
-    public Professor cadastrarProfessor(String nome, String email, String departamento, double salario ) {
-        Professor novoProfessor = new Professor();
-        novoProfessor.setNome(nome);
-        novoProfessor.setEmail(email);
-        novoProfessor.setDepartamento(departamento);
+    public List<Aluno> getAlunos() {
+        return this.alunoDAO.buscarTodos();
+    }
+
+    public Professor cadastrarProfessor(String nome, String email, String departamento, double salario) {
+        Professor novoProfessor = new Professor(nome, email, departamento);
         novoProfessor.setSalario(salario);
-
-        this.professores.add(novoProfessor);
-
-        System.out.println("Professor " + nome + " cadastrado com sucesso!");
-
+        this.professorDAO.salvar(novoProfessor);
         return novoProfessor;
     }
 
-    public List<Aluno> getAlunos() {
-        return this.alunos;
+    public List<Professor> getProfessores() {
+        return this.professorDAO.buscarTodos();
     }
 
-    public List<Professor> getProfessores() {
-        return this.professores;
+    public Disciplina cadastrarDisciplina(String nome) {
+        Disciplina novaDisciplina = new Disciplina();
+        novaDisciplina.setNome(nome);
+        this.disciplinaDAO.salvar(novaDisciplina);
+        return novaDisciplina;
+    }
+
+    public List<Disciplina> getDisciplinas() {
+        return this.disciplinaDAO.buscarTodos();
     }
 
     public void matricularAlunoEmDisciplina(Aluno aluno, Disciplina disciplina) {
-
         if (aluno.getNotas().containsKey(disciplina)) {
             System.out.println("ERRO: Aluno' " + aluno.getNome() + "' já está matriculado(a) na disciplina '" + disciplina.getNome() + "'.");
             return;
@@ -81,28 +76,22 @@ public class AcademiaService {
             System.out.println("ERRO: Nota inválida. A nota deve estar no intervalo entre 0 e 10.");
             return;
         }
-        List<Double> notasDaDisciplina = aluno.getNotas().get(disciplina);
-        notasDaDisciplina.add(nota);
+        aluno.getNotas().get(disciplina).add(nota);
         System.out.println("Nota " + nota + " lançada para o aluno " + aluno.getNome() + " na disciplina solicitada, '" + disciplina.getNome() + "'.");
     }
 
     public double calcularMediaDoAlunoNaDisciplina(Aluno aluno, Disciplina disciplina) {
         if (!aluno.getNotas().containsKey(disciplina)) {
-            System.out.println("ALERTA: O aluno " + aluno.getNome() + " não possui notas em " + disciplina.getNome() + ".");
             return 0.0;
         }
-
-        List<Double> notas = aluno.getNotas().get(disciplina);
-
+        List<Double>notas = aluno.getNotas().get(disciplina);
         if (notas.isEmpty()) {
             return 0.0;
         }
-
         double soma = 0.0;
         for (double nota : notas) {
             soma += nota;
         }
-
         return soma / notas.size();
     }
 }

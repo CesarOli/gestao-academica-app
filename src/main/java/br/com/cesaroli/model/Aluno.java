@@ -10,6 +10,12 @@ public class Aluno extends Pessoa{
     private Curso curso;
     private Map<Disciplina, List<Double>> notas;
 
+    public Aluno(String nome, String email, String matricula) {
+        super(nome, email);
+        this.matricula = matricula;
+        this.notas = new HashMap<>();
+    }
+
     public String getMatricula() {
         return matricula;
     }
@@ -34,15 +40,11 @@ public class Aluno extends Pessoa{
         this.notas = notas;
     }
 
-    public Aluno() {
-        this.notas = new HashMap<>();
-    }
-
     @Override
     public String toString() {
         return "Aluno{" +
-                "nome='" + getNome() + '\'' +
-                ", matrícula='" + matricula + '\'' +
+                "nome='" + getNome()  +
+                ", matrícula='" + matricula +
                 ", curso=" + curso +
                 '}';
     }

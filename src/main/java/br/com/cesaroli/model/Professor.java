@@ -9,6 +9,12 @@ public class Professor extends Pessoa {
     private List<Disciplina> disciplinasLecionadas;
     private double salario;
 
+    public Professor(String nome, String email, String departamento) {
+        super(nome, email);
+        this.departamento = departamento;
+        this.disciplinasLecionadas = new ArrayList<>();
+    }
+
     public String getDepartamento() {
         return departamento;
     }
@@ -33,14 +39,10 @@ public class Professor extends Pessoa {
         this.salario = salario;
     }
 
-    public Professor() {
-        this.disciplinasLecionadas = new ArrayList<>();
-    }
-
     @Override
     public String toString() {
         return "Professor{" +
-                "nome='" + getNome() + '\'' +
+                "nome='" + getNome() +
                 ", departamento=" + getDepartamento() +
                 '}';
     }
