@@ -23,6 +23,7 @@ public class DisciplinaDAO {
             pstmt.setString(1, disciplina.getNome());
 
             pstmt.executeUpdate();
+
     } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar disciplina no banco de dados.", e);
         }
@@ -39,11 +40,12 @@ public class DisciplinaDAO {
 
             while (rs.next()) {
                 Disciplina disciplina = new Disciplina();
+                disciplina.setId(rs.getLong("id"));
                 disciplina.setNome(rs.getString("nome"));
                 disciplinas.add(disciplina);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar disciplina", e);
+            throw new RuntimeException("Erro ao buscar disciplinas", e);
         }
         return disciplinas;
     }

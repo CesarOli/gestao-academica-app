@@ -1,9 +1,17 @@
 package br.com.cesaroli;
 
+import br.com.cesaroli.dao.AlunoDAO;
+import br.com.cesaroli.dao.DisciplinaDAO;
+import br.com.cesaroli.dao.ProfessorDAO;
+import br.com.cesaroli.dao.MatriculaDAO;
 import br.com.cesaroli.model.Aluno;
 import br.com.cesaroli.model.Curso;
 import br.com.cesaroli.model.Disciplina;
 import br.com.cesaroli.model.Professor;
+import br.com.cesaroli.repository.AlunoRepository;
+import br.com.cesaroli.repository.AlunoRepositoryImpl;
+import br.com.cesaroli.repository.ProfessorRepository;
+import br.com.cesaroli.repository.ProfessorRepositoryImpl;
 import br.com.cesaroli.service.AcademiaService;
 
 import java.util.ArrayList;
@@ -15,23 +23,30 @@ public class Main {
 
     public static void main(String[] args) {
 
-        AcademiaService service = new AcademiaService();
+        // Camada de acesso ao dados (DAOs)
+        AlunoDAO alunoDAO = new AlunoDAO();
+        ProfessorDAO professorDAO = new ProfessorDAO();
+        DisciplinaDAO disciplinaDAO = new DisciplinaDAO();
+        MatriculaDAO matriculaDAO = new MatriculaDAO();
+
+        // Camada de Repositório
+        AlunoRepository alunoRepository = new AlunoRepositoryImpl(alunoDAO);
+        ProfessorRepository professorRepository = new ProfessorRepositoryImpl(professorDAO);
+
+        // Camada de Serviços
+        AcademiaService service = new AcademiaService(alunoRepository, professorRepository, disciplinaDAO, matriculaDAO);
 
         Scanner scanner = new Scanner(System.in);
         int opcao = -1;
 
+        if (service.getDisciplinas().isEmpty()) {
+            System.out.println("Nenhuma disciplina encontrada. Cadastrando disciplinas padrão...");
+            service.cadastrarDisciplina("Programação I");
+            service.cadastrarDisciplina("Banco de Dados");
+        }
+
         Curso cursoPadrao = new Curso();
         cursoPadrao.setNome("Análise e Desenvolvimento de Sistemas");
-
-        Disciplina programacaoNivelUm = new Disciplina();
-        programacaoNivelUm.setNome("Progamação I");
-
-        Disciplina bancoDeDados = new Disciplina();
-        bancoDeDados.setNome("Banco de Dados");
-
-        service.getDisciplinas().add(programacaoNivelUm);
-        service.getDisciplinas().add(bancoDeDados);
-
 
         System.out.println("#### BEM-VINDO AO SISTEMA DE GESTÃO ACADÊMICA ####");
 
@@ -47,11 +62,15 @@ public class Main {
             System.out.println("0 - Sair do Sistema");
             System.out.println("Escolha uma opção: ");
 
-            opcao = scanner.nextInt();
-            scanner.nextLine();
+            try {
+                opcao = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("ERRO: Opçõa inválida. Por favor, digite apenas um número ");
+                opcao = -1;
+                continue;
+            }
 
             switch (opcao) {
-
                 case 1:
                     System.out.println("\n --Cadastro de Novo Aluno --");
                     System.out.println("Nome: ");
@@ -78,27 +97,32 @@ public class Main {
                     String departamentoProfessor = scanner.nextLine();
 
                     System.out.println("Salário: ");
-                    double salario = scanner.nextDouble();
-                    scanner.nextLine();
 
-                    service.cadastrarProfessor(nomeProfessor, emailProfessor, departamentoProfessor, salario);
+                    try {
+                        double salario = Double.parseDouble(scanner.nextLine());
+                        service.cadastrarProfessor(nomeProfessor, emailProfessor, departamentoProfessor, salario);
+                    } catch (NumberFormatException e) {
+                        System.out.println("ERRO: Salário invãlido, Por favor, digite um valor válido, por favor.");
+                    }
                     break;
                 case 3:
                     System.out.println("\n-- Lista de Alunos --");
-                    if (service.getAlunos().isEmpty()) {
+                    List<Aluno> alunosDoBanco = service.getAlunos();
+                    if (alunosDoBanco.isEmpty()) {
                         System.out.println("Nenhum aluno cadastrado.");
                     } else {
-                        for (Aluno aluno : service.getAlunos()) {
+                        for (Aluno aluno : alunosDoBanco) {
                             System.out.println(aluno);
                         }
                     }
                     break;
                 case 4:
                     System.out.println("\n-- Lista de Professores --");
-                    if (service.getProfessores().isEmpty()) {
+                    List<Professor> professoresDoBanco = service.getProfessores();
+                    if (professoresDoBanco.isEmpty()) {
                         System.out.println("Nenhum professor cadastrado.");
                     } else {
-                        for (Professor professor : service.getProfessores()) {
+                        for (Professor professor : professoresDoBanco) {
                             System.out.println(professor);
                         }
                     }
@@ -226,9 +250,14 @@ public class Main {
                         System.out.println("ERRO: Entrada inválida. Por favor, digite apenas números");
                     }
                     break;
+                case 0:
+                    System.out.println("\nSaindo do sitema. Obrigado!");
+                    break;
+                default:
+                    System.out.println("\nOpção inválida. Tente novamente.");
+                    break;
             }
-
         }
+        scanner.close();
     }
 }
-

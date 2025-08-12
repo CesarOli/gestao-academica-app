@@ -1,13 +1,15 @@
 package br.com.cesaroli.service;
 
 import br.com.cesaroli.dao.AlunoDAO;
-import br.com.cesaroli.dao.ProfessorDAO;
 import br.com.cesaroli.dao.DisciplinaDAO;
+import br.com.cesaroli.dao.MatriculaDAO;
+import br.com.cesaroli.dao.ProfessorDAO;
 import br.com.cesaroli.model.Aluno;
-import br.com.cesaroli.model.Professor;
 import br.com.cesaroli.model.Curso;
 import br.com.cesaroli.model.Disciplina;
-
+import br.com.cesaroli.model.Professor;
+import br.com.cesaroli.repository.AlunoRepository;
+import br.com.cesaroli.repository.ProfessorRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,36 +17,41 @@ import java.util.List;
 
 public class AcademiaService {
 
-    private AlunoDAO alunoDAO;
-    private ProfessorDAO professorDAO;
-    private DisciplinaDAO disciplinaDAO;
+    private final AlunoRepository alunoRepository;
+    private final ProfessorRepository professorRepository;
+    private final DisciplinaDAO disciplinaDAO;
+    private final MatriculaDAO matriculaDAO;
 
-    public AcademiaService(AlunoDAO alunoDAO, ProfessorDAO professorDAO, DisciplinaDAO disciplinaDAO) {
-        this.alunoDAO = alunoDAO;
-        this.professorDAO = professorDAO;
+    public AcademiaService(AlunoRepository alunoRepository, ProfessorRepository professorRepository, DisciplinaDAO disciplinaDAO, MatriculaDAO matriculaDAO) {
+        this.alunoRepository = alunoRepository;
+        this.professorRepository = professorRepository;
         this.disciplinaDAO = disciplinaDAO;
+        this.matriculaDAO = matriculaDAO;
     }
 
     public Aluno cadastrarAluno(String nome, String email, String matricula, Curso curso) {
         Aluno novoAluno = new Aluno(nome, email, matricula);
         novoAluno.setCurso(curso);
-        this.alunoDAO.salvar(novoAluno);
+        this.alunoRepository.salvar(novoAluno);
         return novoAluno;
     }
 
     public List<Aluno> getAlunos() {
-        return this.alunoDAO.buscarTodos();
+        return this.alunoRepository.buscarTodos();
     }
 
     public Professor cadastrarProfessor(String nome, String email, String departamento, double salario) {
-        Professor novoProfessor = new Professor(nome, email, departamento);
+        Professor novoProfessor = new Professor();
+        novoProfessor.setNome(nome);
+        novoProfessor.setEmail(email);
+        novoProfessor.setDepartamento(departamento);
         novoProfessor.setSalario(salario);
-        this.professorDAO.salvar(novoProfessor);
+        this.professorRepository.salvar(novoProfessor);
         return novoProfessor;
     }
 
     public List<Professor> getProfessores() {
-        return this.professorDAO.buscarTodos();
+        return this.professorRepository.buscarTodos();
     }
 
     public Disciplina cadastrarDisciplina(String nome) {
@@ -59,13 +66,8 @@ public class AcademiaService {
     }
 
     public void matricularAlunoEmDisciplina(Aluno aluno, Disciplina disciplina) {
-        if (aluno.getNotas().containsKey(disciplina)) {
-            System.out.println("ERRO: Aluno' " + aluno.getNome() + "' já está matriculado(a) na disciplina '" + disciplina.getNome() + "'.");
-            return;
+        this.matriculaDAO.salvar(aluno, disciplina);
         }
-        aluno.getNotas().put(disciplina, new ArrayList<>());
-        System.out.println("Matrícula do aluno " + aluno.getNome() + " na disciplina " + disciplina.getNome() + " realizada com sucesso!");
-    }
 
     public void lancarNota(Aluno aluno, Disciplina disciplina, double nota) {
         if (!aluno.getNotas().containsKey(disciplina)) {
@@ -84,7 +86,7 @@ public class AcademiaService {
         if (!aluno.getNotas().containsKey(disciplina)) {
             return 0.0;
         }
-        List<Double>notas = aluno.getNotas().get(disciplina);
+        List<Double> notas = aluno.getNotas().get(disciplina);
         if (notas.isEmpty()) {
             return 0.0;
         }

@@ -6,12 +6,26 @@ import java.util.Map;
 
 public class Aluno extends Pessoa{
 
+    private Long id;
     private String matricula;
     private Curso curso;
-    private Map<Disciplina, List<Double>> notas;
+    private Map<Disciplina, List<Double>> notas = new HashMap<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Aluno() {
+        this.notas = new HashMap<>();
+    }
 
     public Aluno(String nome, String email, String matricula) {
-        super(nome, email);
+        this.setNome(nome);
+        this.setEmail(email);
         this.matricula = matricula;
         this.notas = new HashMap<>();
     }
@@ -45,7 +59,7 @@ public class Aluno extends Pessoa{
         return "Aluno{" +
                 "nome='" + getNome()  +
                 ", matrícula='" + matricula +
-                ", curso=" + curso +
+                ", curso=" + (curso != null ? curso.getNome() : " N/A") +
                 '}';
     }
 }
